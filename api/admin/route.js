@@ -3,7 +3,6 @@ const User = require("./user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const generator = require("generate-password");
-const { json } = require("body-parser");
 
 router.get("/getAdmin", async (req, res) => {
   let user;
@@ -14,7 +13,10 @@ router.get("/getAdmin", async (req, res) => {
   }
   console.log("user", user);
   if (user) {
-    return res.send(user);
+    return res.json({
+      success: true,
+      data: user,
+    });
   }
 });
 
@@ -49,10 +51,16 @@ router.post("/updatePassword", async (req, res) => {
         { _id: user[0].id },
         { $set: { password: cryptPwd } }
       );
-      res.send(updatepwd);
+      return res.json({
+        success: true,
+        data: updatepwd,
+      });
     }
   } catch (err) {
-    res.status(400).send(err);
+    return res.json({
+      success: false,
+      message: "Error",
+    });
   }
 });
 
@@ -70,9 +78,15 @@ router.post("/register", async (req, res) => {
 
   try {
     const saveUser = await newUser.save();
-    res.send(saveUser);
+    return res.json({
+      success: true,
+      data: saveUser,
+    });
   } catch (err) {
-    res.status(400).send(err);
+    return res.json({
+      success: false,
+      message: "Error",
+    });
   }
 });
 
@@ -81,48 +95,66 @@ router.post("/login", async (req, res) => {
   let user;
   try {
     if (req.body["email"]) {
-        user = await User.find({ email: req.body.email });
-      }
+      user = await User.find({ email: req.body.email });
+    }
 
+    //check user
     if (!user.length > 0) {
-      return res.status(400).send("Email or Password is invalid");
+      return res.json({
+        success: false,
+        message: "Email or Password is invalid",
+      });
     }
 
     //check pwd is correct
     const validPwd = await bcrypt.compare(req.body.password, user[0].password);
     if (!validPwd) {
-      return JSON.parse(res);
+      return res.json({
+        success: false,
+        message: "Email or Password is invalid",
+      });
     }
 
     //Create and assign Login Token
     const token = jwt.sign({ _id: user[0]._id }, process.env.TOKEN_SEC);
-    res.header("auth-token", token).send(token);
-    
+    res.header("auth-token", token).json({
+      success: true,
+      token: token,
+    });
   } catch (err) {
-    return res.status(400).send("Error");
+    return res.status(500).json({
+      success: false,
+      message: "Error",
+    });
   }
 });
 
 const verify = auth;
 
-router.get('/', verify, (req, res) => {
-    res.send(req.user);
-    User.findOne({_id: req.user});
+router.get("/", verify, (req, res) => {
+  res.send(req.user);
+  User.findOne({ _id: req.user });
 });
 
 function auth(req, res, next) {
-    const token = req.header('auth-token');
-    if(!token) {
-    return res.status(401).send('Access Denied');
-    }
+  const token = req.header("auth-token");
+  if (!token) {
+    return res.json({
+      success: false,
+      message: "Access Denied"
+    });
+  }
 
-    try {
-        const verified = jwt.verify(token, process.env.TOKEN_SEC);
-        req.user = verified;
-        next();
-    } catch(err) {
-        res.status(400).send('Invalid Token');
-    }
+  try {
+    const verified = jwt.verify(token, process.env.TOKEN_SEC);
+    req.user = verified;
+    next();
+  } catch (err) {
+    return res.json({
+      success: false,
+      message: "Invalid Token"
+    });
+  }
 }
 
 module.exports = router;
