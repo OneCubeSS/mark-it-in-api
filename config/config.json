@@ -4,13 +4,5 @@
     "debug": "yes",
     "env": "dev",
     "AuthtokenExpiryTimeInSeconds": 86400,
-    "dateFormat": "YYYY-MM-DD",
-    "dev": {
-      "dbName": "mark-it-in"
-    },
-    "allowCors": {
-      "urls": ["*"],
-      "methods": "POST, GET, PUT, DELETE, OPTIONS, PATCH",
-      "headers": "Origin, X-Requested-With, Content-Type, Accept, database,  X-Access-Token, Cache-Control, Pragma, If-Modified-Since, Expires"
-    }
+    "dateFormat": "YYYY-MM-DD"
 }

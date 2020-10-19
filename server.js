@@ -7,6 +7,7 @@ const express = require('express'),
   routes = require('./api'),
   dotenv = require('dotenv');
   mongoose = require('mongoose');
+  cors = require('cors');
 
   const path =require('path');
 
@@ -21,38 +22,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
 
-app.use((request, response, next) => {
-  allowCrossDomain(request, response, next);
-});
-
 //DB connection
 mongoose
   .connect(process.env.DB_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 
+app.options('*', cors())
+
 // define a simple route
 app.get('/api', (req, res) => {
     res.json({"message": "Welcome to Mark-It In API application."});
 });
 
-var allowCrossDomain = function(req, res, next) {
-  var allowedOrigins = config.allowCors.urls;
-  var origin = req.headers.origin;
-
-  if (allowedOrigins.indexOf(origin) > -1 || allowedOrigins.indexOf('*') > -1) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Methods', config.allowCors.methods);
-  res.header('Access-Control-Allow-Headers', config.allowCors.headers);
-
-  // Need to immediately return the options method with 200 ok response
-  if ('OPTIONS' === req.method) {
-    return res.sendStatus(200);
-  } else {
-    next();
-  }
-};
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  // Pass to next layer of middleware
+  next();
+});
 
 // Catch errors in Middlewares
 app.use((err, req, res, next) => {

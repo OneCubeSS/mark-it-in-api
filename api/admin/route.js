@@ -4,18 +4,17 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const generator = require("generate-password");
 
-router.get("/getAdmin", async (req, res) => {
-  let user;
-  if (req.body["name"]) {
-    user = await User.find({ name: req.body.name });
-  } else if (req.body["email"]) {
-    user = await User.find({ email: req.body.email });
-  }
-  console.log("user", user);
-  if (user) {
+router.get("/getAdmins", async (req, res) => {
+  const user = await User.find();
+  if (user.length > 0) {
     return res.json({
       success: true,
       data: user,
+    });
+  } else {
+    return res.json({
+      success: false,
+      data: "No Data Found",
     });
   }
 });
@@ -131,7 +130,7 @@ router.post("/login", async (req, res) => {
 
 const verify = auth;
 
-router.get("/", verify, (req, res) => {
+router.get("/auth", verify, (req, res) => {
   res.send(req.user);
   User.findOne({ _id: req.user });
 });
