@@ -19,7 +19,7 @@ router.get("/getPosts", async function (req, res) {
   } catch (err) {
     return res.json({
       success: false,
-      message: "Error",
+      message: err,
     });
   }
 });
@@ -41,12 +41,34 @@ router.get("/getPost/:id", async function (req, res) {
   } catch (err) {
     return res.json({
       success: false,
-      message: "Error",
+      message: err,
     });
   }
 });
 
 // Pull Recent Posts by date for home page
+router.get("/getRecentPost/:page", async function (req, res) {
+  try {
+    let skip = (req.params.page - 1) * 2;
+    const result = await Post.find().skip(skip).limit(2).sort({updated:-1});
+    if (result.length > 0) {
+      return res.json({
+        success: true,
+        data: result,
+      });
+    } else {
+      return res.json({
+        success: false,
+        data: "No Data Found",
+      });
+    }
+  } catch (err) {
+    return res.json({
+      success: false,
+      message: err,
+    });
+  }
+});
 
 router.post("/addPost", async function (req, res) {
   var token = getToken(req.headers);
