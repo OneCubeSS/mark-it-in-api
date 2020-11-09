@@ -91,8 +91,6 @@ async function sendCta(data, callback) {
     "<p> Name : " +data.name+ "</p> <br>" +
     "<p> Email : " +data.email+ "</p> <br>" +
     "<p> Phone Number : " +data.number+ "</p> <br>" +
-    "<p> Website Url : " +data.website+ "</p> <br>" +
-    "<p> Goal : " +data.goal+ "</p> <br>" +
     "<p> Additional Details : " +data.more+ "</p> <br>",
   };
 
