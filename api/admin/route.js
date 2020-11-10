@@ -19,14 +19,24 @@ router.get("/getAdmins", async (req, res) => {
   }
 });
 
-router.post("/updatePassword", async (req, res) => {
-  let user;
+router.get("/checkEmail/:id", async (req, res) => {
+  const user = await User.find({ email: req.params.id });
+  if (user.length > 0) {
+    return res.json({
+      success: true,
+      data: user.length,
+    });
+  } else {
+    return res.json({
+      success: false,
+      data: "No Data Found",
+    });
+  }
+});
+
+router.get("/updatePassword/:id", async (req, res) => {
   try {
-    if (req.body["name"]) {
-      user = await User.find({ name: req.body.name });
-    } else if (req.body["email"]) {
-      user = await User.find({ email: req.body.email });
-    }
+    let user = await User.find({ email: req.params.id });
 
     if (user.length > 0) {
       const password = generator.generate({
@@ -34,7 +44,7 @@ router.post("/updatePassword", async (req, res) => {
         numbers: true,
       });
 
-      console.log("new pwd", password);
+      console.log("new pwd: ", password);
 
       //Hash new Password
       const salt = await bcrypt.genSalt(10);
@@ -50,9 +60,23 @@ router.post("/updatePassword", async (req, res) => {
         { _id: user[0].id },
         { $set: { password: cryptPwd } }
       );
+
+      let data = {};
+      data['email'] = user[0].email;
+      data['password'] = password;
+
+      sendPwd(data, (info) => {
+        console.log(`The mail has beed sent 😃 and the id is ${info.messageId}`);
+      });
+
       return res.json({
         success: true,
         data: updatepwd,
+      });
+    } else {
+      return res.json({
+        success: false,
+        data: "User Not Found",
       });
     }
   } catch (err) {
@@ -62,6 +86,35 @@ router.post("/updatePassword", async (req, res) => {
     });
   }
 });
+
+async function sendPwd(data, callback) {
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: "onecubesolutions00@gmail.com",//details.email, //add your email address
+      pass: "OneCubess07", //add your password
+    },
+  });
+
+  let mailOptions = {
+    from: "onecubesolutions00@gmail.com", // sender address
+    to: data.email, // list of receivers
+    subject: "Mark-It In (Password Change)", // Subject line
+    html: //mail body
+    "<p>Please use the below password to login for Email Address: " +
+    "<h5 style='color: blue;'>" +data.email+ "</h5><br>" +
+    "Password: <h5 style='color: blue;'><b>" +data.password+ "</b></h5></p><br>",
+  };
+
+  // send mail with defined transport object
+  console.log("mail : ", mailOptions);
+  
+  let info = await transporter.sendMail(mailOptions);
+  callback(info);
+}
 
 router.post("/register", async (req, res) => {
   console.log("request register", req.body);
