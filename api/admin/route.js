@@ -94,14 +94,14 @@ async function sendPwd(data, callback) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "onecubesolutions00@gmail.com",//details.email, //add your email address
-      pass: "OneCubess07", //add your password
+      user: "dmarkitin@gmail.com",//details.email, //add your email address
+      pass: "markitin@258", //add your password
     },
   });
 
   let mailOptions = {
-    from: "onecubesolutions00@gmail.com", // sender address
-    to: data.email, // list of receivers
+    from: data.email, // sender address
+    to: "contact@markitin", // list of receivers
     subject: "Mark-It In (Password Change)", // Subject line
     html: //mail body
     "<p>Please use the below password to login for Email Address: " +

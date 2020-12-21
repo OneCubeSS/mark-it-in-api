@@ -46,14 +46,14 @@ async function sendMail(data, callback) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "onecubesolutions00@gmail.com",//details.email, //add your email address
-      pass: "OneCubess07", //add your password
+      user: "dmarkitin@gmail.com",//details.email, //add your email address
+      pass: "markitin@258", //add your password
     },
   });
 
   let mailOptions = {
-    from: "onecubesolutions00@gmail.com", // sender address
-    to: data.email, // list of receivers
+    from: data.email, // sender address
+    to: "contact@markitin", // list of receivers
     subject: "Mark-It In (Contact Us): " + data.name, // Subject line
     html: //mail body
     "<p> Name : " +data.name+ "</p> <br>" +
@@ -78,14 +78,14 @@ async function sendCta(data, callback) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "onecubesolutions00@gmail.com",//details.email, //add your email address
-      pass: "OneCubess07", //add your password
+      user: "dmarkitin@gmail.com",//details.email, //add your email address
+      pass: "markitin@258", //add your password
     },
   });
 
   let ctaOptions = {
-    from: "onecubesolutions00@gmail.com", // sender address
-    to: data.email, // list of receivers
+    from: data.email, // sender address
+    to: "contact@markitin", // list of receivers
     subject: "Mark-It In (CTA): " + data.name, // Subject line
     html: //mail body
     "<p> Name : " +data.name+ "</p> <br>" +
